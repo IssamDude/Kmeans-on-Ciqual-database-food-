@@ -15,6 +15,8 @@ import random
 import math
 import pandas as pd
 import numpy as np
+import plotly.graph_objs as go
+import plotly
 pd.options.mode.chained_assignment = None  # default='warn'
 
 #import re
@@ -166,6 +168,33 @@ print("Nom de l'aliment au code  19051 : ", get_foodname(19051))
 subdata = data[['alim_code','Energy (kcal/100g)','Water (g/100g)','Protein (g/100g)','Carbohydrate (g/100g)','Fat (g/100g)']]
 #La dataframe qu'on va utiliser pour notre algorithme K means.
 #subdata.to_excel("short.xlsx")
+
+markersize = subdata['Energy (kcal/100g)']/10
+markercolor = subdata['Water (g/100g)']/10
+
+#Make Plotly figure
+fig1 = go.Scatter3d(x=subdata['Protein (g/100g)'],
+                    y=subdata['Carbohydrate (g/100g)'],
+                    z=subdata['Fat (g/100g)'],
+                    marker=dict(size=markersize,
+                                color=markercolor,
+                                opacity=0.9,
+                                reversescale=True,
+                                colorscale='Greens'),
+                    line=dict (width=0.02),
+                    mode='markers')
+
+#Make Plot.ly Layout
+mylayout = go.Layout(scene=dict(xaxis=dict( title="Protein"),
+                                yaxis=dict( title="Carbohydrate"),
+                                zaxis=dict(title="Fat")),)
+
+#Plot and save html
+plotly.offline.plot({"data": [fig1],
+                     "layout": mylayout},
+                     auto_open=True,
+                     filename=("5D Plot.html"))
+
 
 def get_foodcomponents(alim_code) : #Nous retourne la liste des composants de l'aliment ayant pour code alim_code
     return acces_row(subdata, getIndexes(subdata, alim_code)[0][0])[1:]
